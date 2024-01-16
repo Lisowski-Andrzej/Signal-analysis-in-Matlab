@@ -1,0 +1,94 @@
+
+
+% visualization of the results available at the Canva link
+
+
+
+lot1 = LOG(6300:6580, :);
+figure(1)
+subplot(2,1,1)
+plot(lot1.HHMMSSkkkk, lot1.left_angle); 
+grid on;
+xlabel('Time')
+ylabel("Left wing deflection")
+title('Steering wheel deflection during first time domain flight')
+
+
+lot1 = LOG(6300:6580, :);
+subplot(2,1,2)
+plot(lot1.HHMMSSkkkk, lot1.right_angle);
+grid on
+xlabel('Time')
+ylabel('Right wing deflection')
+title('Steering wheel deflection during first time domain flight')
+
+
+lot2 = LOG(7790:8139, :);
+
+figure(2)
+subplot(2,1,1)
+plot(lot2.HHMMSSkkkk, lot2.left_angle); 
+grid on;
+xlabel('Time')
+ylabel("Left wing deflection")
+title('Steering wheel deflection during the second time-domain flight')
+
+subplot(2,1,2)
+plot(lot2.HHMMSSkkkk, lot2.right_angle);
+grid on
+xlabel('Time')
+ylabel('Right wing deflection')
+title('Steering wheel deflection during the second time-domain flight')
+
+lot11= [lot1.left_angle lot1.right_angle];
+lot22 =[lot2.left_angle lot2.right_angle];
+
+
+% Fourier transform
+
+
+for i = 1:1:2
+
+Fs = 300;                                                               % czestotliwość próbkowania
+dt = 1/Fs;                                                              % krok czasu 
+T = 100;
+t = 0:dt:T-dt;                                                          % wektor czasu 
+x =lot11(:,1);                                                          % signal
+S = fft(x);                                                             % calculate fft for signal s
+N = length(x);                                                          % number of samples
+df = Fs/N;                                                              % frequency step
+f_vec = (0:(N-1))*df;                                                   % frequency vector
+S_amp = abs(S);                                                         % amplitude
+S_amp_norm = abs(S)/N*10^100; S_amp_norm(1)=S_amp_norm(1)/2;
+
+figure(i+3) 
+stem(f_vec, S_amp_norm)                                                 % plot amplitude spectrum
+xlabel('Frequency [Hz]')
+ylabel('Amplitude [a.u.]')
+xlim([0 Fs/2]);
+title('Deflection in the frequency domain')
+
+end
+
+for i = 1:1:2
+
+Fs = 300;                                                               % czestotliwość próbkowania
+dt = 1/Fs;                                                              % krok czasu 
+T = 100;
+t = 0:dt:T-dt;                                                          % wektor czasu 
+x =lot22(:,i);                                                          % signal
+S = fft(x);                                                             % calculate fft for signal s
+N = length(x);                                                          % number of samples
+df = Fs/N;                                                              % frequency step
+f_vec = (0:(N-1))*df;                                                   % frequency vector
+S_amp = abs(S);                                                         % amplitude
+S_amp_norm = abs(S)/N*10^100; S_amp_norm(1)=S_amp_norm(1)/2;
+
+figure(i+5) 
+stem(f_vec, S_amp_norm)                                                 % plot amplitude spectrum
+xlabel('Frequency [Hz]')
+ylabel('Amplitude [a.u.]')
+xlim([0 Fs/2]);
+title('Deflection in the frequency domain')
+
+end
