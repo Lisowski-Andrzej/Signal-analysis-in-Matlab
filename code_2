@@ -1,0 +1,62 @@
+%% nagranie
+% clc 
+% clear all
+% close all
+
+fs = 8000;
+T = 2;
+
+% nagranie1 = audiorecorder(fs,16,1); 
+% % for i = 1:1:1600
+% % nagranieee = [LOG.left_angle(i,:);];
+% % end
+% nagranie = LOG.left_angle(1:8000);
+% recordblocking(nagranie1,T);
+% nagranie = getaudiodata(nagranie1); 
+
+nagranie = LOG.right_angle;
+
+nagranie = padarray(nagranie, [80000 - size(nagranie, 1), 0], 'post'); % uzupełniam macierz do 80k odczytów ponieważ tyle ma być
+
+N_fr = 20; % ilość fragmentów musi być 10 razy wieksza niż okres 
+N_ok = 2; % ilośc okien 
+
+
+
+%%
+for i = 1:N_fr
+    k = nagranie((1+((i-1)*((fs*T)/N_fr))):((i*((fs*T)/N_fr))));
+    sum=zeros(((fs*T)/(N_fr*N_ok))/2+1,1);
+
+
+    for j = 1:N_ok
+        funkcja = k((1+((j-1)*((fs*T)/(N_fr*N_ok)))):((j*((fs*T)/(N_fr*N_ok)))));
+        N = (fs*T)/(N_fr*N_ok);
+        df = 1/(T/(N_fr*N_ok));
+        funkcja = funkcja-mean(funkcja);
+        funkcja = fft(funkcja);
+        funkcja = abs(funkcja);
+        funkcja = funkcja(1:(N/2)+1);
+        funkcja = funkcja/(N/2);
+        for z=1:length(funkcja)
+            sum(z) =sum(z)+ funkcja(z);
+        end
+
+    end 
+
+
+    for z =1:length(sum)
+    s(i,z) = sum(z)/N_ok;
+    end
+    f = 0:df:(fs/2);
+
+end
+
+
+% ilustracja 
+[X,Y] = meshgrid(f, [1:N_fr]);
+waterfall(X,Y,s),
+xlabel('Frequency [Hz]')
+ylabel('Fragments')
+zlabel('Amplitude')
+
